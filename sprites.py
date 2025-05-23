@@ -21,4 +21,6 @@ error_brute = [[5, 5], # Center px
                [8, 2], [7, 3], [6, 4], [4, 6], [3, 7], [2, 8]  # NE -> SW diagonal
                 ]
 
-projectile_check = [[2, 2], [0, 2], [1, 3], [3, 1], [4, 0]]
+projectile_check = [[2, 2], [0, 2], [1, 3], [3, 1], [4, 0]] # Projectile that player shoots
+
+

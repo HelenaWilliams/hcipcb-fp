@@ -1,11 +1,11 @@
 import pygame
-import time
-import math
+import sprites
 
 all_pixels = []
 all_verts = []
 all_enemies = []
-all_projectiles = []
+all_checks = []
+spawns = []
 
 def move_all(x: int, y:int):
     if x == y:
@@ -15,6 +15,11 @@ def move_all(x: int, y:int):
         i.move(x, y)
     for i in all_verts:
         i.move(x, y)
+    for i in all_enemies:
+        i.get_hitbox().move(x, y)
+    for i in spawns:
+        i[0] += x
+        i[1] += y
 
 class Pixel:
     '''Abstracts away the nitty-gritty of maintaining a perfect pixel system.'''
@@ -53,7 +58,8 @@ class Pixel:
 
 class Character:
     '''Further abstracts drawing by enabling control of multiple pixels simultaneously.'''
-    def __init__(self, pixels: list, enemy = True, speed = 1):
+    def __init__(self, pixels: list, enemy = True, speed = 1, health = 1):
+        self.health = health
         self.pixels = [] # Pixels that belong to this character
         s_x = pixels[0][0]
         s_y = pixels[0][1]
@@ -88,6 +94,18 @@ class Character:
     def get_center(self):
         return self.center_px.rect.center
     
+    def get_hitbox(self):
+        return self.hitbox
+
+    def spawn_proj(self, type, x, y):
+        new_proj = -1
+        if type == "check":
+            new_proj = Character(sprites.projectile_check, False, 2)
+            new_proj.move(64, 32)
+            new_proj.x_dir = x
+            new_proj.y_dir = y
+            all_checks.append(new_proj)
+   
 class HorizPixel(Pixel):
     '''Abstracts drawing straight horizontal lines, since they're predictable.'''
     def __init__(self, x: int, y:int, width: int, opaque=True):
@@ -144,7 +162,7 @@ class VertPixel():
 
 class Hitbox:
     def __init__(self, x: int, y: int, width: int, height: int):
-        self.rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(x*10, y*10, width*10 + 10, height*10 + 10)
     
     def check_hit(self, other):
         if self.rect.colliderect(other.rect):
@@ -152,7 +170,5 @@ class Hitbox:
         return False
 
     def move(self, x, y):
-        self.rect.x = self.rect.x + x
-        self.rect.y = self.rect.y + y
-
-    
+        self.rect.x = self.rect.x + x*10
+        self.rect.y = self.rect.y + y*10
